@@ -1,0 +1,25 @@
+﻿
+
+    <div class="modal" id="createError" tabindex="-2" role="dialog">
+      <div class="modal-dialog modal-dialog-centered justify-content-center" role="document" >
+        <div class="modal-content " style="width: 95%;box-shadow: 1px 2px 10px #727272; background-color: #f7f7f7;">
+          <div class="modal-header">
+            <h5 class="modal-title">Błąd walidacji danych</h5>
+          </div>
+          <div class="modal-body">
+              <p>
+                  Sprawdź poprawność uzupełnionych danych oraz
+                  uzupełnij wszystkie wymagane pola formularza.
+              </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="CreateUserError">Rozumiem</button>
+          </div>
+        </div>
+      </div>
+    </div>
+<script>
+    $('#createError').on('click', '[data-dismiss="CreateUserError"]', function (e) {
+        $('#createUserError').find('#createError').modal('toggle');
+    });
+</script>

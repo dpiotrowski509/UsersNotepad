@@ -1,0 +1,41 @@
+﻿@using UsersNotepad.Database.Models
+@model User
+
+<div class="modal" id="deleteUser" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Usuwanie użytkownika</h5>
+      </div>
+       <div class="modal-body">
+        <p>Czy na pewno chcesz usunąć użytkownika?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="DeleteUser">Nie</button>
+        <button type="button" class="btn btn-danger" data-delete="DeleteUser">Tak</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    $('#deleteUserModal').on('click', '[data-delete="DeleteUser"]', function (e) {
+
+        var dataToSend = {
+            Id: @Model.Id
+        };
+        var serializedData = JSON.stringify(dataToSend);
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("DeleteUser")',
+            data: serializedData,
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function () {
+                $('#deleteUserModal').find('#deleteUser').modal('hide');
+                location.reload(true);
+            },
+        });  
+    });
+</script>
