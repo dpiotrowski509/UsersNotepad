@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="entityframework" Version="6.4.4" />
+    <PackageReference Include="iTextSharp" Version="5.5.13.3" />
   </ItemGroup>
 
   <ItemGroup>
