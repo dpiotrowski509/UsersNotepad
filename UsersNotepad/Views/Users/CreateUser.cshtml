@@ -1,0 +1,108 @@
+﻿@using UsersNotepad.Database.Models
+@model User
+
+<div class="modal" id="createUser" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Tworzenie użytkownika</h5>
+      </div>
+      <div class="modal-body">
+          <p class="text-danger">* pole wymagane</p>
+          <form action="" method="post">
+            <label for="FirstName">Imię:<sup class="text-danger">*</sup></label>
+            <input type="text" maxlength="50" class="form-control" id="FirstName" aria-describedby="FirstNameHelp" placeholder="Wprowadź imię" required>
+            
+            <label for="LastName">Nazwisko:<sup class="text-danger">*</sup></label>
+            <input type="text" maxlength="150" class="form-control" id="LastName" aria-describedby="LastNameHelp" placeholder="Wprowadź nazwisko" required>
+
+            <label for="DateOfBirth">Data urodzenia:<sup class="text-danger">*</sup></label>
+            <small id="BirthDateHelp" class="form-text text-muted hidden"></small>
+            <input type="date" class="form-control" id="DateOfBirth" min="1922-01-01" max="2022-01-01" placeholder="2000-01-01" required>
+            
+            <label for="Sex">Płeć:<sup class="text-danger">*</sup></label>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="Sex" id="IsMan" value="Mężczyzna" checked >
+              <label class="form-check-label" for="CheckMan">
+                Mężczyzna
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="Sex" id="IsWoman" value="Kobieta" >
+              <label class="form-check-label" for="CheckWoman">
+                Kobieta
+              </label>
+            </div>
+            <label for="attributes">Atrybuty:</label>
+            <div class="attributes">
+            </div>
+            <button type="button" id="AddAttributes" class='btn btn-primary'>Dodaj atrybut</button>
+
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="CreateUser">Anuluj</button>
+        <button type="button" class="btn btn-primary" data-add="CreateUser">Dodaj użytkownika</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="~/js/AddAttribute.js" asp-append-version="true"></script>
+
+<script>
+        $('#createUserModal').on('click', '[data-add="CreateUser"]', function (e) {
+
+            var form = $(this).parents('.modal').find('form');
+            var firstName = form.find('#FirstName').val();
+            var lastName = form.find('#LastName').val();
+            var dateOfBirth = form.find('#DateOfBirth').val();
+            var sex = form.find('input[name=Sex]:checked').val();
+
+            var rowsWithAttributes = form.find('.attributes').find('.row');
+            var attributes = [];
+            
+            rowsWithAttributes.each(function (i) {
+                var attributeName = rowsWithAttributes.find($('.AttributeName')[i]).val();
+                var attributeValue = rowsWithAttributes.find($('.AttributeValue')[i]).val();
+                if(attributeName != "" && attributeValue != "")
+                {
+                var attribute = { AttributeName: attributeName, AttributeValue:  attributeValue};
+                attributes.push(attribute);
+                }
+
+            });
+
+            var dataToSend = {
+                FirstName: firstName,
+                LastName: lastName,
+                DateOfBirth: dateOfBirth,
+                Sex: sex,
+                Attributes: attributes
+            };
+            var serializedData = JSON.stringify(dataToSend);
+
+            $.ajax({  
+                type: "POST",  
+                url: '@Url.Action("CreateUser")',  
+                data: serializedData,  
+                dataType: "json",  
+                contentType: "application/json; charset=utf-8",  
+                success: function () {  
+                      $('#createUserModal').find('#createUser').modal('hide');
+                      location.reload(true);
+                },
+                error: function (){
+                     
+                    $.get("/Users/CreateUserError").done(function (data) {
+                        $('#createUserError').html(data);
+                        $('#createUserError').find('#createError').modal({backdrop: false});
+                        $('#createUserError').find('#createError').modal('toggle');
+
+                    });
+                },
+            });  
+
+    });
+</script>

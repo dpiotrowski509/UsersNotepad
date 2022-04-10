@@ -1,0 +1,133 @@
+﻿@using UsersNotepad.Database.Models
+@model User
+
+<div class="modal" id="editUser" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edycja użytkownika</h5>
+      </div>
+      <div class="modal-body">
+          <p class="text-danger">* pole wymagane</p>
+          <form action="" method="post">
+            <label for="FirstName">Imię:<sup class="text-danger">*</sup></label>
+            <input type="text" maxlength="50" class="form-control" id="FirstName" aria-describedby="FirstNameHelp" placeholder="Wprowadź imię" value=@Model.FirstName required>
+            
+            <label for="LastName">Nazwisko:<sup class="text-danger">*</sup></label>
+            <input type="text" maxlength="150" class="form-control" id="LastName" aria-describedby="LastNameHelp" placeholder="Wprowadź nazwisko" value=@Model.LastName required>
+
+            <label for="DateOfBirth">Data urodzenia:<sup class="text-danger">*</sup></label>
+            <input type="date" class="form-control" id="DateOfBirth" min="1922-01-01" max="2022-01-01" placeholder="2000-01-01" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" required>
+            
+            <label for="Sex">Płeć:<sup class="text-danger">*</sup></label>
+            <div class="form-check">
+
+                @if(Model.Sex == "Mężczyzna")
+                {
+                     <input class="form-check-input" type="radio" name="Sex" id="IsMan" value="Mężczyzna" checked/>          
+                }
+                else
+                {
+                    <input class="form-check-input" type="radio" name="Sex" id="IsMan" value="Mężczyzna"/>              
+                }
+
+              <label class="form-check-label" for="CheckMan">
+                Mężczyzna
+              </label>
+            </div>
+            <div class="form-check">
+                @if(Model.Sex == "Kobieta")
+                {
+                     <input class="form-check-input" type="radio" name="Sex" id="IsWoman" value="Kobieta" checked/>          
+                }
+                else
+                {
+                    <input class="form-check-input" type="radio" name="Sex" id="IsWoman" value="Kobieta"/>              
+                }
+              <label class="form-check-label" for="CheckWoman">
+                Kobieta
+              </label>
+            </div>
+            <label for="attributes">Atrybuty:</label>
+            <div class="attributes">
+                @foreach(var attr in @Model.Attributes)
+                {
+                    <div class='row mb-2'>
+                        <div class='col'><input type='text' class='form-control AttributeName' placeholder='Nazwa atrybutu' value="@attr.AttributeName"/></div>
+                        <div class='col'><input type='text' class='form-control AttributeValue' placeholder='Wartość atrybutu' value="@attr.AttributeValue"/></div>
+                    </div>
+                }
+
+
+            </div>
+            <button type="button" id="AddAttributes" class='btn btn-primary'>Dodaj atrybut</button>
+
+          </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="EditUser">Anuluj</button>
+        <button type="button" class="btn btn-primary" data-edit="EditUser">Edytuj użytkownika</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script src="~/js/AddAttribute.js" asp-append-version="true"></script>
+
+<script>
+        $('#editUserModal').on('click', '[data-edit="EditUser"]', function (e) {
+
+            var form = $(this).parents('.modal').find('form');
+            var firstName = form.find('#FirstName').val();
+            var lastName = form.find('#LastName').val();
+            var dateOfBirth = form.find('#DateOfBirth').val();
+            var sex = form.find('input[name=Sex]:checked').val();
+
+            var rowsWithAttributes = form.find('.attributes').find('.row');
+            var attributes = [];
+            
+            rowsWithAttributes.each(function (i) {
+                var attributeName = rowsWithAttributes.find($('.AttributeName')[i]).val();
+                var attributeValue = rowsWithAttributes.find($('.AttributeValue')[i]).val();
+                if(attributeName != "" && attributeValue != "")
+                {
+                var attribute = { AttributeName: attributeName, AttributeValue:  attributeValue};
+                attributes.push(attribute);
+                }
+
+            });
+
+            var dataToSend = {
+                Id: @Model.Id,
+                FirstName: firstName,
+                LastName: lastName,
+                DateOfBirth: dateOfBirth,
+                Sex: sex,
+                Attributes: attributes
+            };
+            var serializedData = JSON.stringify(dataToSend);
+
+            $.ajax({  
+                type: "POST",  
+                url: '@Url.Action("EditUser")',  
+                data: serializedData,  
+                dataType: "json",  
+                contentType: "application/json; charset=utf-8",  
+                success: function () {  
+                      $('#editUserModal').find('#editUser').modal('hide');
+                      location.reload(true);
+                },
+                error: function (){
+                     
+                    $.get("/Users/CreateUserError").done(function (data) {
+                        $('#createUserError').html(data);
+                        $('#createUserError').find('#createError').modal({backdrop: false});
+                        $('#createUserError').find('#createError').modal('toggle');
+
+                    });
+                },
+            });  
+
+    });
+    </script>

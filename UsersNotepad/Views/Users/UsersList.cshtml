@@ -1,0 +1,88 @@
+﻿@using UsersNotepad.Database.Models
+@model List<User>
+
+<div id="createUserModal"></div>
+<div id="editUserModal"></div>
+<div id="deleteUserModal"></div>
+<div id="createUserError"></div>
+<div id="generateReportModal"></div>
+
+<div class="container">
+    <div class="row mb-3">
+        <button type="button" class="btn btn-primary col-md-8 col-sm-12 mb-1" data-toggle="ajax-createUser" data-target="#createUser" data-url="@Url.Action("CreateUser")">Utwórz nowego użytkownika</button>
+        <div class="col-1"></div>
+        <button type="button" class="btn btn-outline-primary col-md-3 col-sm-12 mb-1" data-toggle="ajax-generateReport" data-target="#generateReport" data-url="@Url.Action("GenerateReport","Reports")">Generuj raport</button>
+
+    </div>
+
+    <div class="row">
+        <table class="table">
+            <thead class="thead-dark text-center align-middle">
+                <tr>
+                    <th class="col">
+                        Imię
+                    </th>
+                    <th class="col">
+                        Nazwisko
+                    </th>
+                    <th class="col">
+                        Data urodzenia
+                    </th>
+                    <th class="col d-none d-sm-table-cell">
+                        Płeć
+                    </th>
+                    <th class="col d-none d-sm-table-cell">
+                        Dodatkowe atrybuty
+                    </th>
+                    <th colspan='2' class="col">
+
+                    </th>
+
+                </tr>
+
+            </thead>
+            <tbody class="text-center align-middle">
+                @foreach(var person in Model)
+                {
+                <tr>
+                    <td class="col">
+                        <p class="pe-auto" style="margin: 0" data-toggle="ajax-editUser" data-target="#editUser" data-url="@Url.Action("EditUser", "Users", new {id = person.Id})" style="cursor: pointer">
+                            @person.FirstName
+                        </p>
+                    </td>
+                    <td class="col">
+                        <p class="pe-auto" style="margin: 0" data-toggle="ajax-editUser" data-target="#editUser" data-url="@Url.Action("EditUser", "Users", new {id = person.Id})" style="cursor: pointer">
+                        @person.LastName
+                        </p>
+                    </td>
+                    <td class="col">
+                        <p style="margin: 0 ">
+                        @person.DateOfBirth.ToString("dd.MM.yyyy")
+                        </p>
+                    </td>
+                    <td class="col d-none d-sm-table-cell">
+                        <p style="margin: 0 ">
+                        @person.Sex
+                        </p>
+                    </td>
+                    <td class="col d-none d-sm-table-cell">
+                       <p>
+                       @foreach( var attr in @person.Attributes)
+                       {
+                           var userAttribute = $"{attr.AttributeName}: {attr.AttributeValue}";
+                           <p style="margin: 0 ">@userAttribute</p>
+                       }
+                       </p>
+                    </td>
+                    <td class="col">
+                         <button type="button" class="btn btn-warning" data-toggle="ajax-editUser" data-target="#editUser" data-url="@Url.Action("EditUser", "Users", new {id = person.Id})">Edytuj</button>
+                    </td>
+                    <td class="col">
+                        <button type="button" class="btn btn-danger" data-toggle="ajax-deleteUser" data-target="#deleteUser" data-url="@Url.Action("DeleteUser", "Users", new {id = person.Id})">Usuń</button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
